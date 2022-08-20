@@ -9,11 +9,11 @@ pygame.init()
 pygame.mixer.init()
 
 pygame.mixer.music.set_volume(0.2)  # AJUSTAR VOLUME DO AUDIO DE FUNDO
-pygame.mixer.music.load('../../../games/snake/minha_snake/audios/fundo.mp3')
+pygame.mixer.music.load('audios/fundo.mp3')
 pygame.mixer.music.play(-1)
 
-colision = pygame.mixer.Sound('../../../games/snake/minha_snake/audios/barulho_colisao.wav')
-game_over = pygame.mixer.Sound('../../../games/snake/minha_snake/audios/Game_Over_.mp3')
+colision = pygame.mixer.Sound('audios/barulho_colisao.wav')
+game_over = pygame.mixer.Sound('audios/Game_Over_.mp3')
 game_over.set_volume(0.5)  # AJUSTAR VOLUME DO GAME-OVER
 
 # ---------------------- CONFIGURACÕES BASICAS DA TELA E VELOCIDADES(ETC) ---------------------------------------
@@ -51,7 +51,7 @@ def reiniciar_jogo():
     global morreu, pontos, velocidade
 
     pygame.mixer.music.set_volume(0.2)
-    pygame.mixer.music.load('../../../games/snake/minha_snake/audios/fundo.mp3')
+    pygame.mixer.music.load('audios/fundo.mp3')
     pygame.mixer.music.play(-1)
 
     game_over.stop()
@@ -73,15 +73,6 @@ def aumentando_a_cobra(corpo):
     for posXeY in corpo:
         pygame.draw.rect(display, (255, 255, 0), (posXeY[0], posXeY[1], 40, 40))
 
-
-# ---------------------- CONTINUAR GAME APÓS CERTA PONTUAÇÃO -------------------------------------------------
-
-def continuar(ponto_atual, velo_atual):
-    global pontos, velocidade, tamanho_cobra, corpo_cobra
-
-    pontos = ponto_atual
-    velocidade += velo_atual
-    tamanho_cobra = len(corpo_cobra)
 
 # ---------------------- LOOP PRINCIPAL DO JOGO -------------------------------------------------
 
@@ -252,11 +243,6 @@ while True:
 
     if len(corpo_cobra) > tamanho_cobra:
         del corpo_cobra[0]
-
-    # --------------------------------- PONTUAÇÃO --------------------------------------------
-
-    if pontos == 100 or pontos == 150 or pontos == 200 or pontos == 250:
-        continuar(pontos, 1)
 
     display.blit(formato_ponto, (30, 40))
     pygame.display.update()
