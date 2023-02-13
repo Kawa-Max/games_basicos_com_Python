@@ -49,6 +49,7 @@ class Passaro:
         self.altura = self.y
 
     def mover(self):
+
         # Calcular o deslocamento
         self.tempo += 1
         deslocamento = 1.5 * (self.tempo ** 2) + self.vel * self.tempo
