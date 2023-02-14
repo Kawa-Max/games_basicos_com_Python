@@ -122,7 +122,7 @@ class Cano:
         self.definir_altura()
 
     def definir_altura(self):
-        self.altura = random.randrange(50, 450)
+        self.altura = random.randrange(50, 350)
         self.pos_topo = self.altura - self.CANO_TOPO.get_height()
         self.pos_base = self.altura + self.distancia
 
@@ -165,10 +165,10 @@ class Chao:
         self.chao2 -= self.vel_chao
 
         if self.chao1 + self.largura_chao < 0:
-            self.chao1 = self.chao1 + self.largura_chao
+            self.chao1 = self.chao2 + self.largura_chao
 
         if self.chao2 + self.largura_chao < 0:
-            self.chao2 = self.chao2 + self.largura_chao
+            self.chao2 = self.chao1 + self.largura_chao
 
     def desenhar(self, tela):
         tela.blit(self.imagem, (self.chao1, self.y))
@@ -213,7 +213,7 @@ def main(genomas, config):
     else:
         birds = [Passaro(210, 350)]
 
-    piso = Chao(730)
+    piso = Chao(640)
     can = [Cano(700)]
     screem = pygame.display.set_mode((largura, altura))
     pontinhos = 0
@@ -279,6 +279,11 @@ def main(genomas, config):
             can.append(Cano(600))
             for genoma in list_genoma:
                 genoma.fitness += 5
+
+            if pontinhos >= 10:
+                Cano.vel_cano += 0.2
+            else:
+                Cano.vel_cano = 5
 
         for cano in remover_canos:
             can.remove(cano)

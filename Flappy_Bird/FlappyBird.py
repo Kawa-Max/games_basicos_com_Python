@@ -161,20 +161,19 @@ class Chao:
         self.chao2 -= self.vel_chao
 
         if self.chao1 + self.largura_chao < 0:
-            self.chao1 = self.chao1 + self.largura_chao
+            self.chao1 = self.chao2 + self.largura_chao
 
         if self.chao2 + self.largura_chao < 0:
-            self.chao2 = self.chao2 + self.largura_chao
+            self.chao2 = self.chao1 + self.largura_chao
 
     def desenhar(self, tela):
         tela.blit(self.imagem, (self.chao1, self.y))
         tela.blit(self.imagem, (self.chao2, self.y))
 
 
-def desenhar_jogo(tela, passaros, canos, chao, pontos):
+def desenhar_jogo(tela, passaro, canos, chao, pontos):
     tela.blit(IMAGEM_background, (0, 0))
-    for bird in passaros:
-        bird.desenhar(tela)
+    passaro.desenhar(tela)
     for cano in canos:
         cano.desenhar(tela)
 
@@ -185,17 +184,30 @@ def desenhar_jogo(tela, passaros, canos, chao, pontos):
     pygame.display.update()
 
 
+def game_over(pontos):
+
+    Passaro.vel = 0
+    Cano.vel_cano = 0
+    Chao.vel_chao = 0
+    main.relogio = 0
+
+    pygame.display.set_caption('Game Over')
+
+
 def main():
-    birds = [Passaro(210, 350)]
-    piso = Chao(730)
+    passaro = Passaro(210, 350)
+    piso = Chao(660)
     can = [Cano(700)]
     screem = pygame.display.set_mode((largura, altura))
+    pygame.display.set_caption('Flappy Bird')
     pontinhos = 0
-    tick = pygame.time.Clock()
+    relogio = pygame.time.Clock()
 
     run = True
     while run:
-        tick.tick(30)
+        relogio.tick(30)
+
+        desenhar_jogo(screem, passaro, can, piso, pontinhos)
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -205,26 +217,27 @@ def main():
 
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_SPACE:
-                    for passaro in birds:
-                        passaro.pular()
+                    passaro.pular()
 
-        for passaro in birds:
-            passaro.mover()
-
+        passaro.mover()
         piso.mover()
+
         add_cano = False
         remover_canos = []
 
         for cano in can:
-            for i, passaro in enumerate(birds):
-                if cano.colisao(passaro):
-                    birds.pop(i)
-                    break
-                if not cano.passou and passaro.x > cano.x:
-                    cano.passou = True
-                    add_cano = True
+            if cano.colisao(passaro):
+                game_over(pontinhos)
+
+                desenhar_jogo.texto = FONTE_PONTOS.render(f'Pontuação: {pontinhos}', 1, BRANCO)
+                screem.blit(desenhar_jogo.texto, (200, 200))
+
+            if not cano.passou and passaro.x > cano.x:
+                cano.passou = True
+                add_cano = True
 
             cano.mover()
+
             if cano.x + cano.CANO_TOPO.get_width() < 0:
                 remover_canos.append(cano)
 
@@ -232,14 +245,17 @@ def main():
             pontinhos += 1
             can.append(Cano(600))
 
+            if pontinhos >= 10:
+                Cano.vel_cano += 0.2
+            else:
+                Cano.vel_cano = 5
+
         for cano in remover_canos:
             can.remove(cano)
 
-        for i, passaro in enumerate(birds):
-            if (passaro.y + passaro.imagem.get_height()) > piso.y or passaro.y < 0:
-                birds.pop(i)
-
-        desenhar_jogo(screem, birds, can, piso, pontinhos)
+        if (passaro.y + passaro.imagem.get_height()) > piso.y or passaro.y < 0:
+            game_over(pontinhos)
+            screem.blit(desenhar_jogo.texto, (200, 200))
 
 
 main()
