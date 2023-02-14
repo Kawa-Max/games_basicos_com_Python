@@ -184,26 +184,29 @@ def desenhar_jogo(tela, passaro, canos, chao, pontos):
     pygame.display.update()
 
 
-def game_over(pontos):
+def reiniciar_game(tela):
+    passaro = Passaro(210, 350)
+    piso = Chao(660)
+    can = [Cano(700)]
+    pontinhos = 0
+    run = True
+    morreu = False
 
-    Passaro.vel = 0
-    Cano.vel_cano = 0
-    Chao.vel_chao = 0
-    main.relogio = 0
-
-    pygame.display.set_caption('Game Over')
+    desenhar_jogo(tela, passaro, can, piso, pontinhos)
 
 
 def main():
     passaro = Passaro(210, 350)
     piso = Chao(660)
     can = [Cano(700)]
+    pontinhos = 0
+
     screem = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption('Flappy Bird')
-    pontinhos = 0
     relogio = pygame.time.Clock()
 
     run = True
+
     while run:
         relogio.tick(30)
 
@@ -226,11 +229,30 @@ def main():
         remover_canos = []
 
         for cano in can:
-            if cano.colisao(passaro):
-                game_over(pontinhos)
+            if cano.colisao(passaro) or (passaro.y + passaro.imagem.get_height()) > piso.y or passaro.y < 0:
+                morreu = True
 
-                desenhar_jogo.texto = FONTE_PONTOS.render(f'Pontuação: {pontinhos}', 1, BRANCO)
-                screem.blit(desenhar_jogo.texto, (200, 200))
+                while morreu:
+                    screem.blit(IMAGEM_background, (0, 0))
+
+                    for evento in pygame.event.get():
+                        if evento.type == pygame.QUIT:
+                            run = False
+                            pygame.quit()
+                            quit()
+
+                        if evento.type == pygame.KEYDOWN:
+                            if evento.key == pygame.K_SPACE:
+                                morreu = False
+                                reiniciar_game(screem)
+
+                    texto = FONTE_PONTOS.render(f'Sua Pontuação: {pontinhos}', True, BRANCO)
+                    texto2 = FONTE_PONTOS.render('Press space to continue', True, BRANCO)
+
+                    screem.blit(texto, (90, 200))
+                    screem.blit(texto2, (70, 380))
+
+                    pygame.display.update()
 
             if not cano.passou and passaro.x > cano.x:
                 cano.passou = True
@@ -253,9 +275,7 @@ def main():
         for cano in remover_canos:
             can.remove(cano)
 
-        if (passaro.y + passaro.imagem.get_height()) > piso.y or passaro.y < 0:
-            game_over(pontinhos)
-            screem.blit(desenhar_jogo.texto, (200, 200))
+    pygame.display.update()
 
 
 main()
